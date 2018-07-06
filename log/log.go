@@ -26,7 +26,7 @@ func Get() *zap.Logger {
 }
 
 // New setups Zap to the correct log level and correct output format.
-func New(logFormat, logLevel string, statsReporter tally.StatsReporter) error {
+func New(logFormat, logLevel string) error {
 	var zapConfig zap.Config
 
 	switch logFormat {
@@ -62,13 +62,6 @@ func New(logFormat, logLevel string, statsReporter tally.StatsReporter) error {
 		return err
 	}
 
-	if statsReporter != nil {
-		logger = logger.WithOptions(zap.Hooks(func(entry zapcore.Entry) error {
-			statsReporter.ReportCounter("log_count", map[string]string{"level": entry.Level.String()}, 1)
-			return nil
-		}))
-	}
-
 	go func(config zap.Config) {
 
 		defaultLevel := config.Level
@@ -93,6 +86,16 @@ func New(logFormat, logLevel string, statsReporter tally.StatsReporter) error {
 	}(zapConfig)
 	wrappedLogger.zap = logger.Named("app")
 	return nil
+}
+
+// LoggerWithMetrics add hook to zap.Logger which count log levels
+func LoggerWithMetrics(statsReporter tally.StatsReporter) {
+	if statsReporter != nil {
+		wrappedLogger.zap = wrappedLogger.zap.WithOptions(zap.Hooks(func(entry zapcore.Entry) error {
+			statsReporter.ReportGauge("log_count", map[string]string{"level": entry.Level.String()}, 1)
+			return nil
+		}))
+	}
 }
 
 // NewDevelopment setups Zap to the correct log level and correct output format for development.
