@@ -23,7 +23,7 @@ func (bp *BufferPool) Get() (b *bytes.Buffer) {
 	select {
 	case b = <-bp.c:
 	default:
-		b = bytes.NewBuffer(make([]byte, defaultBufSize))
+		b = bytes.NewBuffer(make([]byte, 0, defaultBufSize))
 	}
 	return
 }
