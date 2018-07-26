@@ -103,7 +103,7 @@ func NewDevelopment() error {
 	var zapConfig zap.Config
 
 	zapConfig = zap.NewDevelopmentConfig()
-	zapConfig.DisableStacktrace = false
+	zapConfig.DisableStacktrace = true
 	zapConfig.DisableCaller = false
 	zapConfig.EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {}
 	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
