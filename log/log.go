@@ -6,7 +6,6 @@ import (
 	"syscall"
 	"time"
 
-	"fmt"
 	"github.com/uber-go/tally"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
