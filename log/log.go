@@ -93,7 +93,9 @@ func New(logFormat, logLevel string) error {
 func LoggerWithMetrics(statsReporter tally.Scope) {
 	if statsReporter != nil {
 		wrappedLogger.zap = wrappedLogger.zap.WithOptions(zap.Hooks(func(entry zapcore.Entry) error {
-			statsReporter.Counter(fmt.Sprintf("%s_count", entry.Level.String())).Inc(1)
+			if entry.Level == zap.ErrorLevel {
+				statsReporter.Counter("error_count").Inc(1)
+			}
 			return nil
 		}))
 	}
