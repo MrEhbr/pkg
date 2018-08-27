@@ -101,7 +101,7 @@ func LoggerWithMetrics(statsReporter tally.Scope) {
 }
 
 // NewDevelopment setups Zap to the correct log level and correct output format for development.
-func NewDevelopment() error {
+func NewDevelopment(logLevel string) error {
 	var zapConfig zap.Config
 
 	zapConfig = zap.NewDevelopmentConfig()
@@ -109,6 +109,22 @@ func NewDevelopment() error {
 	zapConfig.DisableCaller = false
 	zapConfig.EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {}
 	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	// Set the logger
+	switch logLevel {
+	case "debug":
+		zapConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	case "info":
+		zapConfig.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
+	case "warn":
+		zapConfig.Level = zap.NewAtomicLevelAt(zap.WarnLevel)
+	case "error":
+		zapConfig.Level = zap.NewAtomicLevelAt(zap.ErrorLevel)
+	case "fatal":
+		zapConfig.Level = zap.NewAtomicLevelAt(zap.FatalLevel)
+	default:
+		zapConfig.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
+	}
 
 	logger, err := zapConfig.Build()
 	if err != nil {

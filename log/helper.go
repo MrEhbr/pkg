@@ -31,7 +31,7 @@ func Setup(c *cli.Context) error {
 			return err
 		}
 	} else if c.String("env") == "dev" {
-		if err := NewDevelopment(); err != nil {
+		if err := NewDevelopment(c.String("log_level")); err != nil {
 			return err
 		}
 	} else if c.String("env") == "test" {
