@@ -26,7 +26,7 @@ func Flags() []cli.Flag {
 
 // Setup helps with setting up logger
 func Setup(c *cli.Context) error {
-	if c.String("env") == "prod" {
+	if c.String("env") == "prod" || c.String("env") == "int" {
 		if err := New(c.String("log_format"), c.String("log_level")); err != nil {
 			return err
 		}
