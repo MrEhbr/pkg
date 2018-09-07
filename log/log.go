@@ -41,6 +41,13 @@ func New(logFormat, logLevel string) error {
 		zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	}
 
+	zapConfig.EncoderConfig.TimeKey = "timestamp"
+	zapConfig.EncoderConfig.LevelKey = "log_level"
+	zapConfig.EncoderConfig.MessageKey = "message"
+	zapConfig.EncoderConfig.EncodeTime = func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(t.Format("2006-01-02T15:04:05.000Z07:00"))
+	}
+
 	// Set the logger
 	switch logLevel {
 	case "debug":
@@ -126,6 +133,13 @@ func NewDevelopment(logLevel string) error {
 		zapConfig.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 	}
 
+	zapConfig.EncoderConfig.TimeKey = "timestamp"
+	zapConfig.EncoderConfig.LevelKey = "log_level"
+	zapConfig.EncoderConfig.MessageKey = "message"
+	zapConfig.EncoderConfig.EncodeTime = func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(t.Format("2006-01-02T15:04:05.000Z07:00"))
+	}
+
 	logger, err := zapConfig.Build()
 	if err != nil {
 		return err
@@ -144,6 +158,13 @@ func NewTest() (*observer.ObservedLogs, error) {
 	zapConfig.DisableCaller = true
 	zapConfig.EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {}
 	zapConfig.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+
+	zapConfig.EncoderConfig.TimeKey = "timestamp"
+	zapConfig.EncoderConfig.LevelKey = "log_level"
+	zapConfig.EncoderConfig.MessageKey = "message"
+	zapConfig.EncoderConfig.EncodeTime = func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(t.Format("2006-01-02T15:04:05.000Z07:00"))
+	}
 
 	logger, err := zapConfig.Build()
 	if err != nil {
