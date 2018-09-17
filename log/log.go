@@ -63,7 +63,6 @@ func New(logFormat, logLevel string) error {
 	default:
 		zapConfig.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 	}
-
 	logger, err := zapConfig.Build()
 	if err != nil {
 		return err
@@ -91,8 +90,13 @@ func New(logFormat, logLevel string) error {
 			}
 		}
 	}(zapConfig)
-	wrappedLogger.zap = logger.Named("app")
+	wrappedLogger.zap = logger
 	return nil
+}
+
+// NameLogger named core logger
+func NameLogger(name string) {
+	wrappedLogger.zap = wrappedLogger.zap.Named(name)
 }
 
 // LoggerWithMetrics add hook to zap.Logger which count log levels
@@ -103,6 +107,15 @@ func LoggerWithMetrics(statsReporter tally.Scope) {
 				statsReporter.Counter("error_count").Inc(1)
 			}
 			return nil
+		}))
+	}
+}
+
+// LoggerWithMetrics add hook to zap.Logger which count log levels
+func LoggerWithErrorMetrics(statsReporter tally.StatsReporter, extractor TagsExtractor, metricName string) {
+	if statsReporter != nil {
+		wrappedLogger.zap = wrappedLogger.zap.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+			return NewErrorMetricsCore(core, extractor, metricName, statsReporter)
 		}))
 	}
 }
@@ -144,7 +157,7 @@ func NewDevelopment(logLevel string) error {
 	if err != nil {
 		return err
 	}
-	wrappedLogger.zap = logger.Named("app")
+	wrappedLogger.zap = logger
 	return nil
 }
 
@@ -175,7 +188,7 @@ func NewTest() (*observer.ObservedLogs, error) {
 	logger = logger.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core {
 		return testCore
 	}))
-	wrappedLogger.zap = logger.Named("app")
+	wrappedLogger.zap = logger
 
 	return logs, nil
 }
