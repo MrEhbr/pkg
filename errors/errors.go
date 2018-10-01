@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -57,6 +58,29 @@ func WrapErr(err error, msg, name string) error {
 		return nil
 	}
 	e := &Error{Message: fmt.Sprintf("%s: %s", msg, err.Error()), Tags: map[string]string{"name": name}}
+	e.populateStack()
+	return e
+}
+
+// E is a useful func for instantiating Errors.
+func E(args ...interface{}) error {
+	if len(args) == 0 {
+		panic("call to E with no arguments")
+	}
+	e := &Error{Tags: make(map[string]string)}
+	b := new(bytes.Buffer)
+	for _, arg := range args {
+		switch arg := arg.(type) {
+		case string:
+			e.Tags["name"] = arg
+		case int:
+			e.Tags["code"] = strconv.Itoa(arg)
+		case error:
+			pad(b, ": ")
+			b.WriteString(arg.Error())
+		}
+	}
+	e.Message = b.String()
 	e.populateStack()
 	return e
 }
