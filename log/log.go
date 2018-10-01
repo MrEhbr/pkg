@@ -1,15 +1,14 @@
 package log
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
 	"github.com/uber-go/tally"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 type logger struct {
@@ -28,7 +27,6 @@ func Get() *zap.Logger {
 // New setups Zap to the correct log level and correct output format.
 func New(logFormat, logLevel string) error {
 	var zapConfig zap.Config
-
 	switch logFormat {
 	case "json":
 		zapConfig = zap.NewProductionConfig()
