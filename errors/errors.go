@@ -61,6 +61,16 @@ func WrapErr(err error, msg, name string) error {
 	return e
 }
 
+// NameError returns a Error for the given error and name of error.
+func NameError(err error, name string) error {
+	if err == nil {
+		return nil
+	}
+	e := &Error{Message: err.Error(), Tags: map[string]string{"name": name}}
+	e.populateStack()
+	return e
+}
+
 // WrapErr returns a Error for the given error and msg.
 func Wrap(err error, msg, name string) error {
 	if err == nil {
