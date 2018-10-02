@@ -9,13 +9,13 @@ import (
 type TagsExtractor func(err error) map[string]string
 
 type core struct {
-	reporter   tally.StatsReporter
+	reporter   tally.Scope
 	core       zapcore.Core
 	extractor  TagsExtractor
 	metricName string
 }
 
-func NewErrorMetricsCore(originalCore zapcore.Core, extractor TagsExtractor, metricName string, reporter tally.StatsReporter) zapcore.Core {
+func NewErrorMetricsCore(originalCore zapcore.Core, extractor TagsExtractor, metricName string, reporter tally.Scope) zapcore.Core {
 	return &core{
 		reporter:   reporter,
 		core:       originalCore,
@@ -48,7 +48,7 @@ func (c *core) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 				break
 			}
 		}
-		c.reporter.ReportCounter(c.metricName, tags, 1)
+		c.reporter.Tagged(tags).Counter(c.metricName).Inc(1)
 	}
 	return c.core.Write(entry, fields)
 }

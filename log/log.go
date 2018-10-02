@@ -110,10 +110,10 @@ func LoggerWithMetrics(statsReporter tally.Scope) {
 }
 
 // LoggerWithMetrics add hook to zap.Logger which count log levels
-func LoggerWithErrorMetrics(statsReporter tally.StatsReporter, extractor TagsExtractor, metricName string) {
-	if statsReporter != nil {
+func LoggerWithErrorMetrics(scope tally.Scope, extractor TagsExtractor, metricName string) {
+	if scope != nil {
 		wrappedLogger.zap = wrappedLogger.zap.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-			return NewErrorMetricsCore(core, extractor, metricName, statsReporter)
+			return NewErrorMetricsCore(core, extractor, metricName, scope)
 		}))
 	}
 }
