@@ -33,7 +33,10 @@ func (c *core) With(fields []zapcore.Field) zapcore.Core {
 }
 
 func (c *core) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	return c.core.Check(ent, ce)
+	if c.Enabled(ent.Level) {
+		return ce.AddCore(ent, c)
+	}
+	return ce
 }
 
 func (c *core) Write(entry zapcore.Entry, fields []zapcore.Field) error {
